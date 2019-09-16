@@ -1,0 +1,92 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(ggplot2)
+patientA = read.csv("p000078.psv", sep = '|')
+patientB = read.csv("p001461.psv", sep = '|')
+patientC = read.csv("p000384.psv", sep = '|')
+```
+
+# Missing values 
+
+```{r}
+ggplot(data = patientA, aes(x = ICULOS, y = Resp)) + geom_line() + geom_vline(xintercept=which.max(patientA$SepsisLabel), col='red')
+
+```
+
+```{r}
+library(zoo)
+ggplot(data = patientA, aes(x = ICULOS, y = g)) + geom_line() + labs(title="",
+        x ="Time in hours", y = "Respiration Rate ") + geom_vline(xintercept=which.max(patientA$SepsisLabel), col='red')
+```
+
+
+
+
+# Animate graph gganimate 
+
+
+
+```{r}
+Pa = ggplot(data=patientA, aes(ICULOS)) + geom_line(aes(y = c(14,na.locf(Resp)), colour = "Respiration Rate")) + geom_line(aes(y =  c(102,na.locf(HR)), colour = "Heart Rate")) + geom_line(aes(y=c(36,36,36,36,na.locf(Temp)) , colour = "Temperature"))  + 
+geom_line(aes(y=c(97,na.locf(MAP)), colour = "MAP"))+  labs(title="Patient p000078 ",x ="Time in hours", y = "") + theme_minimal()   + labs(color='Clinical variables') + geom_vline(xintercept=which.max(patientA$SepsisLabel)+6, col='black') + theme(legend.position = "none") + geom_vline(xintercept=which.max(patientA$SepsisLabel), col='black', linetype="dotted") 
+
+Pa
+```
+
+
+```{r}
+Pb = ggplot(data=patientB, aes(ICULOS)) + geom_line(aes(y = c(13,na.locf(Resp)), colour = "Respiration Rate")) + geom_line(aes(y =  c(59,na.locf(HR)), colour = "Heart Rate")) + geom_line(aes(y=c(35.56,35.56,35.56,na.locf(Temp)) , colour = "Temperature"))  + 
+geom_line(aes(y=c(70,na.locf(MAP)), colour = "MAP"))+  labs(title="Patient p001461 ",x ="Time in hours", y = "") + theme_minimal()   + labs(color='Clinical variables') + geom_vline(xintercept=which.max(patientB$SepsisLabel)+6, col='black') + theme(legend.position = "none") + geom_vline(xintercept=which.max(patientB$SepsisLabel), col='black', linetype="dotted") 
+
+Pb
+```
+
+
+
+```{r}
+Pc = ggplot(data=patientC, aes(ICULOS)) + geom_line(aes(y = c(19,na.locf(Resp)), colour = "Respiration Rate")) + geom_line(aes(y =  c(112,na.locf(HR)), colour = "Heart Rate")) + geom_line(aes(y=c(35.33,na.locf(Temp)) , colour = "Temperature"))  + 
+geom_line(aes(y=c(68,68,na.locf(MAP)), colour = "MAP"))+  labs(title="Patient p000384 ",x ="Time in hours", y = "") + theme_minimal()   + labs(color='Clinical variables') + geom_vline(xintercept=which.max(patientC$SepsisLabel)+6, col='black') + theme(legend.position = "none") + geom_vline(xintercept=which.max(patientC$SepsisLabel), col='black', linetype="dotted") 
+
+Pc
+```
+
+
+
+```{r}
+ggarrange(Pa, Pb,Pc,ncol = 1, nrow = 3, labels = c("A", "B", "C"))
+```
+
+
+```{r}
+library(ggplot2)
+library(gganimate)
+library(gifski)
+library(png)
+
+
+Step  <- c(1:104,1:104, 1:104, 1:104)
+Name  <- c(rep("Respiration Rate",104), rep("Heart Rate",104), rep("Mean Arterial Pressure", 104),  rep("Temperature", 104))
+Value <- c(c(14,na.locf(patientA$Resp)), c(102,na.locf(patientA$HR)), c(97,na.locf(patientA$MAP)),c(36,36,36,36,na.locf(patientA$Temp)))
+Final <- data.frame(Step, Name, Value)
+
+a <- ggplot(Final, aes(x = Step, y = Value, group = Name, color = factor(Name))) + 
+ geom_line(size=1) + 
+ geom_point(size = 2) + 
+ transition_reveal(Step) + 
+ coord_cartesian(clip = 'off') + 
+ theme_minimal() + labs(title="Patient p000078 ",x ="Time in hours", y = "") +
+ theme(plot.margin = margin(5.5, 40, 5.5, 5.5))  + labs(color='Clinical variables') 
+
+options(gganimate.dev_args = list(width = 7, height = 6, units = 'in', res=100))
+animate(a, nframes = 100)
+```
+
+
+
+
+
