@@ -19,7 +19,11 @@ https://ineskris.github.io/
 
 ## References 
 
-The PhysioNet Computing in Cardiology Challenge 2019
+- The PhysioNet Computing in Cardiology Challenge 2019
 https://physionet.org/content/challenge-2019/1.0.0/
+
+
+
+- Krissaane, Ines., Wilkinson, Richard, Kingsley Hampton, Alshenaifi Jumanah. 2019. “Anomaly Detection Semi-Supervised Framework for Sepsis Treatment.” 2019 Computing in Cardiology Conference (CinC). Computing in Cardiology 
 
 
